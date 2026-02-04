@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ಊರ ಕವನಗಳು</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#f3e4bf;
+  --app:#faf6ed;
+  --card:#f0ebe1;
+  --text:#4b463f;
+  --accent:#c9b37e;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:'Inter',sans-serif;
+  color:var(--text);
+}
+
+.app{
+  max-width:420px;
+  margin:auto;
+  min-height:100vh;
+  background:var(--app);
+  border-radius:28px;
+  overflow:hidden;
+}
+
+header{
+  padding:18px;
+  text-align:center;
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+}
+
+.card{
+  background:var(--card);
+  margin:14px;
+  padding:16px;
+  border-radius:20px;
+  box-shadow:0 6px 12px rgba(0,0,0,.05);
+  cursor:pointer;
+}
+
+.card p{
+  font-family:'Playfair Display',serif;
+  line-height:1.6;
+  margin:0;
+}
+
+.meta{
+  margin-top:10px;
+  font-size:12px;
+  opacity:.65;
+  display:flex;
+  justify-content:space-between;
+  font-style:italic;
+}
+
+.actions{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+  font-size:13px;
+  opacity:.75;
+}
+
+.add{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  background:var(--accent);
+  color:white;
+  font-size:28px;
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+}
+
+.box{
+  background:var(--app);
+  width:90%;
+  max-width:400px;
+  border-radius:22px;
+  padding:18px;
+  position:relative;
+}
+
+.close{
+  position:absolute;
+  top:12px;
+  right:14px;
+  cursor:pointer;
+  opacity:.6;
+}
+
+.box input,.box textarea{
+  width:100%;
+  border:none;
+  background:transparent;
+  color:var(--text);
+  margin-bottom:10px;
+  outline:none;
+}
+
+.box textarea{height:120px;}
+
+.full{
+  display:none;
+  padding:20px;
+}
+
+.back{
+  opacity:.6;
+  cursor:pointer;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+<div class="app" id="app">
+
+<header><b>ಊರ್ಮನಿಯರ್‌ ಹಾಡ್</b></header>
+
+<div id="list"></div>
+
+<div class="full" id="full">
+  <div class="back" onclick="closeFull()">← back</div>
+  <div id="fullText"></div>
+</div>
+
+<div class="add" id="addBtn" onclick="openEditor()">＋</div>
+
+<div class="modal" id="editor">
+  <div class="box">
+    <div class="close" onclick="closeEditor()">✕</div>
+    <input id="title" placeholder="Poem title">
+    <textarea id="content" placeholder="Write your poem..."></textarea>
+    <input id="author" placeholder="Author name">
+    <button onclick="savePoem()">Save</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* OWNER CONTROL */
+const IS_OWNER = true; // set false for public view
+
+let poems = JSON.parse(localStorage.getItem("poems")) || [];
+let liked = JSON.parse(localStorage.getItem("liked")) || {};
+let currentIndex = null;
+
+if(IS_OWNER){
+  addBtn.style.display="flex";
+}
+
+function formatDate(d){
+  return new Date(d).toLocaleDateString(undefined,{
+    day:'2-digit', month:'short', year:'numeric'
+  });
+}
+
+function render(){
+  list.innerHTML="";
+  poems.forEach((p,i)=>{
+    list.innerHTML+=`
+      <div class="card" onclick="openFull(${i})">
+        <p>${p.text.slice(0,120)}...</p>
+        <div class="meta">
+          <span>— ${p.author}</span>
+          <span>${formatDate(p.date)}</span>
+        </div>
+        <div class="actions">
+          <span onclick="event.stopPropagation();like(${i})">
+            ${liked[i] ? '❤️' : '🤍'} ${p.likes}
+          </span>
+          ${IS_OWNER ? `<span onclick="event.stopPropagation();deletePoem(${i})">🗑️</span>` : ``}
+        </div>
+      </div>`;
+  });
+}
+render();
+
+/* OWNER */
+function openEditor(){ editor.style.display="flex"; }
+function closeEditor(){ editor.style.display="none"; }
+
+function savePoem(){
+  poems.unshift({
+    title:title.value,
+    text:content.value,
+    author:author.value || "Unknown",
+    date:new Date(),
+    likes:0
+  });
+  localStorage.setItem("poems",JSON.stringify(poems));
+  closeEditor();
+  title.value=""; content.value=""; author.value="";
+  render();
+}
+
+function deletePoem(i){
+  if(confirm("Delete this poem?")){
+    poems.splice(i,1);
+    localStorage.setItem("poems",JSON.stringify(poems));
+    render();
+  }
+}
+
+/* LIKE – ONE TIME */
+function like(i){
+  if(liked[i]) return;
+  poems[i].likes++;
+  liked[i]=true;
+  localStorage.setItem("liked",JSON.stringify(liked));
+  localStorage.setItem("poems",JSON.stringify(poems));
+  render();
+}
+
+/* FULL VIEW */
+function openFull(i){
+  currentIndex=i;
+  full.style.display="block";
+  list.style.display="none";
+  fullText.innerHTML=`
+    <h3>${poems[i].title}</h3>
+    <p>${poems[i].text.replace(/\n/g,"<br>")}</p>
+    <div class="meta">
+      <span>— ${poems[i].author}</span>
+      <span>${formatDate(poems[i].date)}</span>
+    </div>`;
+}
+
+function closeFull(){
+  full.style.display="none";
+  list.style.display="block";
+}
+</script>
+
+</body>
+</html>
