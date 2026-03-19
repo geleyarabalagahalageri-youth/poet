@@ -119,23 +119,26 @@ db.ref("poems").on("value", (snapshot) => {
 });
 
 function like(id, current) {
-    // 1. Get current likes from storage
+    // 1. Get the list of posts this user has already liked from their browser
     let myLikes = JSON.parse(localStorage.getItem("myLikes") || "[]");
 
-    // 2. Double check they haven't liked it yet (safety check)
+    // 2. CHECK: If this post ID is already in the list, stop the function
     if (myLikes.includes(id)) {
+        alert("You have already liked this poem!");
         return; 
     }
 
-    // 3. Update Firebase
-    db.ref("poems/" + id).update({ likes: current + 1 })
-    .then(() => {
-        // 4. Save to local storage so they can't like it again
+    // 3. If not liked yet, update Firebase
+    db.ref("poems/" + id).update({ 
+        likes: current + 1 
+    }).then(() => {
+        // 4. SAVE: Add this post ID to the browser's memory so they can't like again
         myLikes.push(id);
         localStorage.setItem("myLikes", JSON.stringify(myLikes));
         
-        // 5. Refresh the list to show the new state
+        // 5. Refresh the display
         render();
+    });
     });
 }
 
