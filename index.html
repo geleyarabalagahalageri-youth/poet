@@ -3,39 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ಊರ ಕವನಗಳು</title>
+<title>ಊರ ಕವನಗಳು | Public Diary</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root{ --bg:#f3e4bf; --app:#faf6ed; --card:#f0ebe1; --text:#4b463f; --accent:#c9b37e; }
 body{ margin:0; background:var(--bg); font-family:'Inter',sans-serif; color:var(--text); }
-.app{ max-width:420px; margin:auto; min-height:100vh; background:var(--app); border-radius:28px; overflow:hidden; position: relative; }
-header{ padding:18px; text-align:center; font-family:'Playfair Display',serif; font-size:22px; }
-#status{ font-size: 10px; text-align: center; opacity: 0.5; margin-bottom: 10px; }
-.card{ background:var(--card); margin:14px; padding:16px; border-radius:20px; box-shadow:0 6px 12px rgba(0,0,0,.05); cursor:pointer; }
-.card p{ font-family:'Playfair Display',serif; line-height:1.6; margin:0; white-space: pre-wrap; }
-.meta{ margin-top:10px; font-size:12px; opacity:.65; display:flex; justify-content:space-between; font-style:italic; }
-.actions{ display:flex; justify-content:space-between; margin-top:10px; font-size:13px; opacity:.75; }
-.add{ position:fixed; bottom:20px; right:20px; width:54px; height:54px; border-radius:50%; background:var(--accent); color:white; font-size:28px; display:none; align-items:center; justify-content:center; cursor: pointer; z-index: 100; }
-.modal{ position:fixed; inset:0; background:rgba(0,0,0,.4); display:none; align-items:center; justify-content:center; z-index: 200; }
-.box{ background:var(--app); width:90%; max-width:400px; border-radius:22px; padding:18px; position:relative; }
-.close{ position:absolute; top:12px; right:14px; cursor:pointer; opacity:.6; }
-.box input, .box textarea{ width:100%; border:1px solid #ddd; background:white; color:var(--text); margin-bottom:10px; padding: 8px; box-sizing: border-box; border-radius: 8px; }
-.box textarea{ height:120px; }
-.full{ display:none; padding:20px; }
-.back{ opacity:.6; cursor:pointer; margin-bottom:10px; }
-button { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
+.app{ max-width:420px; margin:auto; min-height:100vh; background:var(--app); border-radius:28px; overflow:hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+
+header{ padding:25px 18px; text-align:center; font-family:'Playfair Display',serif; font-size:24px; cursor: pointer; user-select: none; }
+#status { font-size: 10px; text-align: center; opacity: 0.4; margin-top: -15px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+
+.card{ background:var(--card); margin:14px; padding:18px; border-radius:20px; box-shadow:0 4px 10px rgba(0,0,0,.03); cursor:pointer; transition: transform 0.2s; }
+.card:active { transform: scale(0.98); }
+.card p{ font-family:'Playfair Display',serif; line-height:1.6; margin:0; font-size: 17px; color: #333; }
+
+.meta{ margin-top:12px; font-size:12px; opacity:.6; display:flex; justify-content:space-between; font-style:italic; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; }
+.actions{ display:flex; justify-content:space-between; margin-top:12px; font-size:14px; }
+.btn-del { color: #cc7a7a; cursor: pointer; padding: 5px; }
+
+.add{ position:fixed; bottom:30px; right:20px; width:56px; height:56px; border-radius:50%; background:var(--accent); color:white; font-size:32px; display:none; align-items:center; justify-content:center; cursor: pointer; z-index: 100; box-shadow: 0 8px 15px rgba(201, 179, 126, 0.4); }
+
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index: 200; backdrop-filter: blur(3px); }
+.box{ background:var(--app); width:85%; max-width:380px; border-radius:24px; padding:25px; position:relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+.close{ position:absolute; top:15px; right:18px; cursor:pointer; font-size: 20px; opacity: 0.5; }
+
+.box input, .box textarea{ width:100%; border:1px solid #e0d6bc; background:#fff; color:var(--text); margin-bottom:12px; padding: 12px; box-sizing: border-box; border-radius: 12px; font-family: inherit; outline: none; }
+.box textarea{ height:150px; resize: none; }
+.box button { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
+
+.full{ display:none; padding:25px; animation: fadeIn 0.3s ease; }
+.back{ opacity:0.5; cursor:pointer; margin-bottom:20px; font-weight: bold; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 
 <body>
 <div class="app">
-    <header><b>ಊರ್ಮನಿಯರ್‌ ಹಾಡ್</b></header>
-    <div id="status">Connecting to database...</div>
+    <header id="mainTitle" ondblclick="adminLogin()"><b>ಊರ್ಮನಿಯರ್‌ ಹಾಡ್</b></header>
+    <div id="status">Syncing...</div>
     
     <div id="list"></div>
 
     <div class="full" id="full">
-        <div class="back" onclick="closeFull()">← back</div>
+        <div class="back" onclick="closeFull()">← Back to Diary</div>
         <div id="fullText"></div>
     </div>
 
@@ -44,10 +54,11 @@ button { background: var(--accent); color: white; border: none; padding: 10px 20
     <div class="modal" id="editor">
         <div class="box">
             <div class="close" onclick="closeEditor()">✕</div>
-            <input id="title" placeholder="Poem title">
-            <textarea id="content" placeholder="Write your poem..."></textarea>
-            <input id="author" placeholder="Author name">
-            <button onclick="savePoem()">Save to Public Diary</button>
+            <h3 style="margin-top:0">New Diary Entry</h3>
+            <input id="title" placeholder="Title (Optional)">
+            <textarea id="content" placeholder="Write your thoughts..."></textarea>
+            <input id="author" placeholder="Your Name">
+            <button onclick="savePoem()">Publish Entry</button>
         </div>
     </div>
 </div>
@@ -56,7 +67,7 @@ button { background: var(--accent); color: white; border: none; padding: 10px 20
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
 <script>
-// --- 1. PASTE YOUR CONFIG HERE ---
+// --- 1. FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyCNJX5mEmwBmd0uwh_Rjz8GyXczU3f6aA8",
   authDomain: "public-diary-dd4bc.firebaseapp.com",
@@ -72,52 +83,59 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- 2. PERMISSIONS ---
-// Set to 'true' to show Add/Delete buttons. Set to 'false' for the public version.
-const IS_OWNER = true; 
+// --- 2. ADMIN CONTROL ---
+let IS_OWNER = false; 
+const MY_PASSWORD = "1234"; // <--- CHANGE YOUR PASSWORD HERE
 
-if(IS_OWNER) { document.getElementById('addBtn').style.display = "flex"; }
+function adminLogin() {
+    let pass = prompt("Enter Admin Password to Edit:");
+    if(pass === MY_PASSWORD) {
+        IS_OWNER = true;
+        document.getElementById('addBtn').style.display = "flex";
+        alert("Admin Mode Active!");
+        render(); // Refresh list to show delete buttons
+    } else {
+        alert("Incorrect Password.");
+    }
+}
 
 let poemsArray = [];
 
 // --- 3. FETCH DATA ---
 db.ref("poems").on("value", (snapshot) => {
-    document.getElementById("status").innerText = "Online";
+    document.getElementById("status").innerText = "• Online";
     const data = snapshot.val();
     
     if(!data) {
-        document.getElementById("list").innerHTML = "<p style='text-align:center; opacity:0.5;'>No entries yet.</p>";
+        document.getElementById("list").innerHTML = "<p style='text-align:center; opacity:0.4; margin-top:50px;'>The diary is empty.</p>";
         return;
     }
 
-    // Convert object to array and sort by date
     poemsArray = Object.entries(data).map(([id, value]) => ({ id, ...value }));
     poemsArray.sort((a, b) => b.date - a.date); 
-    
     render();
 }, (error) => {
-    document.getElementById("status").innerText = "Error: " + error.message;
+    document.getElementById("status").innerText = "Offline: " + error.message;
 });
 
-function render() {
-    const listDiv = document.getElementById("list");
-    listDiv.innerHTML = "";
-    
-    poemsArray.forEach((p) => {
-        listDiv.innerHTML += `
-            <div class="card" onclick="openFull('${p.id}')">
-                <p>${p.text.substring(0, 100)}${p.text.length > 100 ? '...' : ''}</p>
-                <div class="meta">
-                    <span>— ${p.author}</span>
-                    <span>${new Date(p.date).toLocaleDateString()}</span>
-                </div>
-                <div class="actions">
-                    <span onclick="event.stopPropagation(); like('${p.id}', ${p.likes || 0})">
-                        ❤️ ${p.likes || 0}
-                    </span>
-                    ${IS_OWNER ? `<span onclick="event.stopPropagation(); deletePoem('${p.id}')">🗑️</span>` : ``}
-                </div>
-            </div>`;
+function like(id, current) {
+    // 1. Get current likes from storage
+    let myLikes = JSON.parse(localStorage.getItem("myLikes") || "[]");
+
+    // 2. Double check they haven't liked it yet (safety check)
+    if (myLikes.includes(id)) {
+        return; 
+    }
+
+    // 3. Update Firebase
+    db.ref("poems/" + id).update({ likes: current + 1 })
+    .then(() => {
+        // 4. Save to local storage so they can't like it again
+        myLikes.push(id);
+        localStorage.setItem("myLikes", JSON.stringify(myLikes));
+        
+        // 5. Refresh the list to show the new state
+        render();
     });
 }
 
@@ -127,7 +145,7 @@ function savePoem() {
     const c = document.getElementById("content").value;
     const a = document.getElementById("author").value || "Anonymous";
 
-    if(!c) return alert("Please enter some content.");
+    if(!c) return alert("Please write something first.");
 
     db.ref("poems").push({
         title: t,
@@ -139,11 +157,12 @@ function savePoem() {
         closeEditor();
         document.getElementById("title").value = "";
         document.getElementById("content").value = "";
-    }).catch(e => alert("Permission denied. Check your Firebase Rules!"));
+        document.getElementById("author").value = "";
+    });
 }
 
 function deletePoem(id) {
-    if(confirm("Are you sure you want to delete this?")) {
+    if(confirm("Permanently delete this entry?")) {
         db.ref("poems/" + id).remove();
     }
 }
@@ -158,12 +177,13 @@ function openFull(id) {
     document.getElementById("full").style.display = "block";
     document.getElementById("list").style.display = "none";
     document.getElementById("fullText").innerHTML = `
-        <h3 style="font-family:'Playfair Display'">${p.title || 'Untitled'}</h3>
-        <p style="white-space: pre-wrap; line-height:1.8;">${p.text}</p>
+        <h2 style="font-family:'Playfair Display'; margin-bottom:10px;">${p.title || 'Untitled'}</h2>
+        <p style="white-space: pre-wrap; line-height:1.8; font-size:18px;">${p.text}</p>
         <div class="meta">
-            <span>— ${p.author}</span>
+            <span>Written by — ${p.author}</span>
             <span>${new Date(p.date).toLocaleDateString()}</span>
         </div>`;
+    window.scrollTo(0,0);
 }
 
 function closeFull() {
