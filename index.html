@@ -69,14 +69,13 @@ header{ padding:25px 18px; text-align:center; font-family:'Playfair Display',ser
 <script>
 // --- 1. FIREBASE CONFIG ---
 const firebaseConfig = {
-  apiKey: "AIzaSyCNJX5mEmwBmd0uwh_Rjz8GyXczU3f6aA8",
-  authDomain: "public-diary-dd4bc.firebaseapp.com",
-  databaseURL:"https://public-diary-dd4bc-default-rtdb.firebaseio.com/",
-  projectId: "public-diary-dd4bc",
-  storageBucket: "public-diary-dd4bc.firebasestorage.app",
-  messagingSenderId: "425689697738",
-  appId: "1:425689697738:web:a1ad3211eb1089da395333",
-  measurementId: "G-8SSNXL0SEQ"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://public-diary-dd4bc-default-rtdb.firebaseio.com/", 
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // Initialize
@@ -119,22 +118,22 @@ db.ref("poems").on("value", (snapshot) => {
 });
 
 function like(id, current) {
-    // 1. Get the list of IDs this person already liked from their browser memory
+    // 1. Get current likes from storage
     let myLikes = JSON.parse(localStorage.getItem("myLikes") || "[]");
 
-    // 2. If this ID is already in the list, stop here (don't allow another like)
+    // 2. Double check they haven't liked it yet (safety check)
     if (myLikes.includes(id)) {
         return; 
     }
 
-    // 3. Update the like count in Firebase
+    // 3. Update Firebase
     db.ref("poems/" + id).update({ likes: current + 1 })
     .then(() => {
-        // 4. After success, add this ID to the browser memory so they can't like again
+        // 4. Save to local storage so they can't like it again
         myLikes.push(id);
         localStorage.setItem("myLikes", JSON.stringify(myLikes));
         
-        // 5. Refresh the list to show the new heart icon
+        // 5. Refresh the list to show the new state
         render();
     });
 }
