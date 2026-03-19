@@ -118,25 +118,24 @@ db.ref("poems").on("value", (snapshot) => {
     document.getElementById("status").innerText = "Offline: " + error.message;
 });
 
-function render() {
-    const listDiv = document.getElementById("list");
-    listDiv.innerHTML = "";
-    
-    poemsArray.forEach((p) => {
-        listDiv.innerHTML += `
-            <div class="card" onclick="openFull('${p.id}')">
-                <p>${p.text.substring(0, 100)}${p.text.length > 100 ? '...' : ''}</p>
-                <div class="meta">
-                    <span>— ${p.author}</span>
-                    <span>${new Date(p.date).toLocaleDateString()}</span>
-                </div>
-                <div class="actions">
-                    <span onclick="event.stopPropagation(); like('${p.id}', ${p.likes || 0})">
-                        ❤️ ${p.likes || 0}
-                    </span>
-                    ${IS_OWNER ? `<span class="btn-del" onclick="event.stopPropagation(); deletePoem('${p.id}')">🗑️ Delete</span>` : ``}
-                </div>
-            </div>`;
+function like(id, current) {
+    // 1. Get current likes from storage
+    let myLikes = JSON.parse(localStorage.getItem("myLikes") || "[]");
+
+    // 2. Double check they haven't liked it yet (safety check)
+    if (myLikes.includes(id)) {
+        return; 
+    }
+
+    // 3. Update Firebase
+    db.ref("poems/" + id).update({ likes: current + 1 })
+    .then(() => {
+        // 4. Save to local storage so they can't like it again
+        myLikes.push(id);
+        localStorage.setItem("myLikes", JSON.stringify(myLikes));
+        
+        // 5. Refresh the list to show the new state
+        render();
     });
 }
 
