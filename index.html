@@ -3,196 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ಊರ ಕವನಗಳು | Public Diary</title>
+<title>Public Diary</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
 <style>
 :root{ --bg:#f3e4bf; --app:#faf6ed; --card:#f0ebe1; --text:#4b463f; --accent:#c9b37e; }
-body{ margin:0; background:var(--bg); font-family:'Inter',sans-serif; color:var(--text); }
-.app{ max-width:420px; margin:auto; min-height:100vh; background:var(--app); border-radius:28px; overflow:hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+body{ margin:0; background:var(--bg); font-family:'Inter',sans-serif; }
 
-header{ padding:25px 18px; text-align:center; font-family:'Playfair Display',serif; font-size:24px; cursor: pointer; user-select: none; }
-#status { font-size: 10px; text-align: center; opacity: 0.4; margin-top: -15px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+.app{ max-width:420px; margin:auto; min-height:100vh; background:var(--app); border-radius:28px; overflow:hidden; }
 
-.card{ background:var(--card); margin:14px; padding:18px; border-radius:20px; box-shadow:0 4px 10px rgba(0,0,0,.03); cursor:pointer; transition: transform 0.2s; }
-.card:active { transform: scale(0.98); }
-.card p{ font-family:'Playfair Display',serif; line-height:1.6; margin:0; font-size: 17px; color: #333; }
+header{ padding:25px; text-align:center; font-family:'Playfair Display'; font-size:24px; cursor:pointer; }
 
-.meta{ margin-top:12px; font-size:12px; opacity:.6; display:flex; justify-content:space-between; font-style:italic; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 8px; }
-.actions{ display:flex; justify-content:space-between; margin-top:12px; font-size:14px; }
-.btn-del { color: #cc7a7a; cursor: pointer; padding: 5px; }
+.card{ background:var(--card); margin:14px; padding:18px; border-radius:20px; cursor:pointer; }
+.meta{ font-size:12px; opacity:.6; display:flex; justify-content:space-between; margin-top:10px; }
+.actions{ display:flex; justify-content:space-between; margin-top:10px; }
 
-.add{ position:fixed; bottom:30px; right:20px; width:56px; height:56px; border-radius:50%; background:var(--accent); color:white; font-size:32px; display:none; align-items:center; justify-content:center; cursor: pointer; z-index: 100; box-shadow: 0 8px 15px rgba(201, 179, 126, 0.4); }
+.add{ position:fixed; bottom:30px; right:20px; width:56px; height:56px; border-radius:50%; background:var(--accent); color:white; font-size:32px; display:none; align-items:center; justify-content:center; cursor:pointer; }
 
-.modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index: 200; backdrop-filter: blur(3px); }
-.box{ background:var(--app); width:85%; max-width:380px; border-radius:24px; padding:25px; position:relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-.close{ position:absolute; top:15px; right:18px; cursor:pointer; font-size: 20px; opacity: 0.5; }
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; }
+.box{ background:white; width:85%; padding:20px; border-radius:20px; }
 
-.box input, .box textarea{ width:100%; border:1px solid #e0d6bc; background:#fff; color:var(--text); margin-bottom:12px; padding: 12px; box-sizing: border-box; border-radius: 12px; font-family: inherit; outline: none; }
-.box textarea{ height:150px; resize: none; }
-.box button { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; }
-
-.full{ display:none; padding:25px; animation: fadeIn 0.3s ease; }
-.back{ opacity:0.5; cursor:pointer; margin-bottom:20px; font-weight: bold; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+input, textarea{ width:100%; margin-bottom:10px; padding:10px; border-radius:10px; border:1px solid #ccc; }
+button{ width:100%; padding:12px; background:var(--accent); border:none; color:white; border-radius:10px; cursor:pointer; }
 </style>
 </head>
 
 <body>
+
 <div class="app">
-    <header id="mainTitle" ondblclick="adminLogin()"><b>ಊರ್ಮನಿಯರ್‌ ಹಾಡ್</b></header>
-    <div id="status">Syncing...</div>
-    
-    <div id="list"></div>
 
-    <div class="full" id="full">
-        <div class="back" onclick="closeFull()">← Back to Diary</div>
-        <div id="fullText"></div>
-    </div>
+<header ondblclick="adminLogin()"><b>ಊರ್ಮನಿಯರ್ ಹಾಡ್</b></header>
 
-    <div class="add" id="addBtn" onclick="openEditor()">＋</div>
+<div id="list"></div>
 
-    <div class="modal" id="editor">
-        <div class="box">
-            <div class="close" onclick="closeEditor()">✕</div>
-            <h3 style="margin-top:0">New Diary Entry</h3>
-            <input id="title" placeholder="Title (Optional)">
-            <textarea id="content" placeholder="Write your thoughts..."></textarea>
-            <input id="author" placeholder="Your Name">
-            <button onclick="savePoem()">Publish Entry</button>
-        </div>
-    </div>
+<div class="add" id="addBtn" onclick="openEditor()">＋</div>
+
+<div class="modal" id="editor">
+  <div class="box">
+    <h3>New Entry</h3>
+    <input id="title" placeholder="Title">
+    <textarea id="content" placeholder="Write..."></textarea>
+    <input id="author" placeholder="Your Name">
+    <button onclick="savePoem()">Publish Entry</button>
+  </div>
 </div>
 
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
 <script>
-// --- 1. FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyCNJX5mEmwBmd0uwh_Rjz8GyXczU3f6aA8",
   authDomain: "public-diary-dd4bc.firebaseapp.com",
   databaseURL:"https://public-diary-dd4bc-default-rtdb.firebaseio.com/",
   projectId: "public-diary-dd4bc",
-  storageBucket: "public-diary-dd4bc.firebasestorage.app",
-  messagingSenderId: "425689697738",
-  appId: "1:425689697738:web:a1ad3211eb1089da395333",
-  measurementId: "G-8SSNXL0SEQ"
 };
 
-// Initialize
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- 2. ADMIN CONTROL ---
-let IS_OWNER = false; 
-const MY_PASSWORD = "1234"; // <--- CHANGE YOUR PASSWORD HERE
+let IS_OWNER = false;
+const PASSWORD = "1234";
 
-function adminLogin() {
-    let pass = prompt("Enter Admin Password to Edit:");
-    if(pass === MY_PASSWORD) {
-        IS_OWNER = true;
-        document.getElementById('addBtn').style.display = "flex";
-        alert("Admin Mode Active!");
-        render(); // Refresh list to show delete buttons
-    } else {
-        alert("Incorrect Password.");
-    }
+function adminLogin(){
+  let pass = prompt("Enter Admin Password");
+  if(pass === PASSWORD){
+    IS_OWNER = true;
+    document.getElementById("addBtn").style.display="flex";
+    alert("Admin Mode Enabled");
+    render();
+  }
 }
 
 let poemsArray = [];
 
-// --- 3. FETCH DATA ---
-db.ref("poems").on("value", (snapshot) => {
-    document.getElementById("status").innerText = "• Online";
-    const data = snapshot.val();
-    
-    if(!data) {
-        document.getElementById("list").innerHTML = "<p style='text-align:center; opacity:0.4; margin-top:50px;'>The diary is empty.</p>";
-        return;
-    }
+// FETCH DATA
+db.ref("poems").on("value", snap=>{
+  const data = snap.val();
 
-    poemsArray = Object.entries(data).map(([id, value]) => ({ id, ...value }));
-    poemsArray.sort((a, b) => b.date - a.date); 
-    render();
-}, (error) => {
-    document.getElementById("status").innerText = "Offline: " + error.message;
+  if(!data){
+    document.getElementById("list").innerHTML = "<p style='text-align:center'>No entries</p>";
+    return;
+  }
+
+  poemsArray = Object.entries(data).map(([id,val])=>({id,...val}));
+  poemsArray.sort((a,b)=>b.date-a.date);
+
+  render();
 });
 
-function like(id, current) {
-    // 1. Get current likes from storage
-    let myLikes = JSON.parse(localStorage.getItem("myLikes") || "[]");
+// RENDER
+function render(){
+  const list = document.getElementById("list");
 
-    // 2. Double check they haven't liked it yet (safety check)
-    if (myLikes.includes(id)) {
-        return; 
-    }
+  list.innerHTML = poemsArray.map(p=>`
+    <div class="card" onclick="openFull('${p.id}')">
+      <p>${(p.text || "").substring(0,100)}...</p>
 
-    // 3. Update Firebase
-    db.ref("poems/" + id).update({ likes: current + 1 })
-    .then(() => {
-        // 4. Save to local storage so they can't like it again
-        myLikes.push(id);
-        localStorage.setItem("myLikes", JSON.stringify(myLikes));
-        
-        // 5. Refresh the list to show the new state
-        render();
-    });
+      <div class="meta">
+        <span>${p.author}</span>
+        <span>${new Date(p.date).toLocaleDateString()}</span>
+      </div>
+
+      <div class="actions">
+        <span onclick="event.stopPropagation(); like('${p.id}', ${p.likes||0})">❤️ ${p.likes||0}</span>
+        ${IS_OWNER ? `<span onclick="deletePoem('${p.id}'); event.stopPropagation();">🗑️</span>` : ""}
+      </div>
+    </div>
+  `).join("");
 }
 
-// --- 4. ACTIONS ---
-function savePoem() {
-    const t = document.getElementById("title").value;
-    const c = document.getElementById("content").value;
-    const a = document.getElementById("author").value || "Anonymous";
+// SAVE ENTRY
+function savePoem(){
+  const t = title.value;
+  const c = content.value;
+  const a = author.value || "Anonymous";
 
-    if(!c) return alert("Please write something first.");
+  if(!c.trim()){
+    alert("Write something!");
+    return;
+  }
 
-    db.ref("poems").push({
-        title: t,
-        text: c,
-        author: a,
-        date: Date.now(),
-        likes: 0
-    }).then(() => {
-        closeEditor();
-        document.getElementById("title").value = "";
-        document.getElementById("content").value = "";
-        document.getElementById("author").value = "";
-    });
+  db.ref("poems").push({
+    title:t,
+    text:c,
+    author:a,
+    date:Date.now(),
+    likes:0
+  })
+  .then(()=>{
+    alert("Published!");
+    closeEditor();
+    title.value=""; content.value=""; author.value="";
+  })
+  .catch(err=>{
+    alert("Error: "+err.message);
+  });
 }
 
-function deletePoem(id) {
-    if(confirm("Permanently delete this entry?")) {
-        db.ref("poems/" + id).remove();
-    }
+// DELETE
+function deletePoem(id){
+  event.stopPropagation(); // VERY IMPORTANT (prevents card click)
+
+  if(!confirm("Delete this entry permanently?")) return;
+
+  db.ref("poems/" + id).remove()
+  .then(() => {
+      alert("✅ Deleted successfully");
+
+      // remove instantly from UI (no wait for Firebase)
+      poemsArray = poemsArray.filter(p => p.id !== id);
+      render();
+  })
+  .catch((err) => {
+      console.error(err);
+      alert("❌ Delete failed: " + err.message);
+  });
 }
 
-function like(id, current) {
-    db.ref("poems/" + id).update({ likes: current + 1 });
+// LIKE (with local protection)
+function like(id,current){
+  let liked = JSON.parse(localStorage.getItem("liked")||"[]");
+
+  if(liked.includes(id)) return;
+
+  db.ref("poems/"+id).update({likes:current+1});
+
+  liked.push(id);
+  localStorage.setItem("liked",JSON.stringify(liked));
 }
 
-function openFull(id) {
-    const p = poemsArray.find(x => x.id === id);
-    if(!p) return;
-    document.getElementById("full").style.display = "block";
-    document.getElementById("list").style.display = "none";
-    document.getElementById("fullText").innerHTML = `
-        <h2 style="font-family:'Playfair Display'; margin-bottom:10px;">${p.title || 'Untitled'}</h2>
-        <p style="white-space: pre-wrap; line-height:1.8; font-size:18px;">${p.text}</p>
-        <div class="meta">
-            <span>Written by — ${p.author}</span>
-            <span>${new Date(p.date).toLocaleDateString()}</span>
-        </div>`;
-    window.scrollTo(0,0);
-}
+// UI
+function openEditor(){ editor.style.display="flex"; }
+function closeEditor(){ editor.style.display="none"; }
 
-function closeFull() {
-    document.getElementById("full").style.display = "none";
-    document.getElementById("list").style.display = "block";
+// FULL VIEW
+function openFull(id){
+  const p = poemsArray.find(x=>x.id===id);
+  alert(p.text);
 }
-
-function openEditor() { document.getElementById("editor").style.display = "flex"; }
-function closeEditor() { document.getElementById("editor").style.display = "none"; }
 </script>
+
 </body>
 </html>
