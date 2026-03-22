@@ -37,6 +37,21 @@ button{ width:100%; padding:12px; background:var(--accent); border:none; color:w
 
 <div id="list"></div>
 
+<!-- ✅ MOVE HERE -->
+<div id="reader" style="display:none; padding:20px;">
+
+  <div onclick="closeReader()" style="cursor:pointer; margin-bottom:15px; opacity:0.6;">
+    ← Back
+  </div>
+
+  <h2 id="readTitle" style="font-family:'Playfair Display'; margin-bottom:10px;"></h2>
+
+  <div id="readMeta" style="font-size:12px; opacity:0.6; margin-bottom:20px;"></div>
+
+  <div id="readContent" style="line-height:1.8; font-size:18px; white-space:pre-wrap;"></div>
+
+</div>
+
 <div class="add" id="addBtn" onclick="openEditor()">＋</div>
 
 <div class="modal" id="editor">
@@ -48,6 +63,20 @@ button{ width:100%; padding:12px; background:var(--accent); border:none; color:w
     <button onclick="savePoem()">Publish Entry</button>
   </div>
 </div>
+
+</div>
+
+<div id="reader" style="display:none; padding:20px;">
+
+  <div onclick="closeReader()" style="cursor:pointer; margin-bottom:15px; opacity:0.6;">
+    ← Back
+  </div>
+
+  <h2 id="readTitle" style="font-family:'Playfair Display'; margin-bottom:10px;"></h2>
+
+  <div id="readMeta" style="font-size:12px; opacity:0.6; margin-bottom:20px;"></div>
+
+  <div id="readContent" style="line-height:1.8; font-size:18px; white-space:pre-wrap;"></div>
 
 </div>
 
@@ -110,7 +139,7 @@ function render(){
       </div>
 
       <div class="actions">
-        <span onclick="event.stopPropagation(); like('${p.id}', ${p.likes||0})">❤️ ${p.likes||0}</span>
+        <span onclick="like('${p.id}', ${p.likes||0}); event.stopPropagation();">❤️ ${p.likes || 0}</span>
         ${IS_OWNER ? `<span onclick="deletePoem('${p.id}'); event.stopPropagation();">🗑️</span>` : ""}
       </div>
     </div>
@@ -166,25 +195,64 @@ function deletePoem(id){
 }
 
 // LIKE (with local protection)
-function like(id,current){
-  let liked = JSON.parse(localStorage.getItem("liked")||"[]");
+function like(id, current){
+  event.stopPropagation();
 
-  if(liked.includes(id)) return;
+  let liked = JSON.parse(localStorage.getItem("likedPosts") || "[]");
 
-  db.ref("poems/"+id).update({likes:current+1});
+  // 🚫 Already liked
+  if(liked.includes(id)){
+    alert("You already liked this ❤️");
+    return;
+  }
 
-  liked.push(id);
-  localStorage.setItem("liked",JSON.stringify(liked));
+  // ✅ Update Firebase
+  db.ref("poems/" + id).update({
+    likes: (current || 0) + 1
+  })
+  .then(() => {
+      // Save locally
+      liked.push(id);
+      localStorage.setItem("likedPosts", JSON.stringify(liked));
+
+      // Update UI instantly
+      const post = poemsArray.find(p => p.id === id);
+      if(post){
+        post.likes = (post.likes || 0) + 1;
+      }
+
+      render();
+  })
+  .catch(err => {
+      console.error(err);
+      alert("Error liking post");
+  });
 }
 
 // UI
 function openEditor(){ editor.style.display="flex"; }
 function closeEditor(){ editor.style.display="none"; }
 
+function closeReader(){
+  document.getElementById("reader").style.display = "none";
+  document.getElementById("list").style.display = "block";
+}
+
 // FULL VIEW
 function openFull(id){
   const p = poemsArray.find(x=>x.id===id);
-  alert(p.text);
+  if(!p) return;
+
+  document.getElementById("list").style.display = "none";
+  document.getElementById("reader").style.display = "block";
+
+  document.getElementById("readTitle").innerText = p.title || "Untitled";
+  document.getElementById("readMeta").innerText =
+    "By " + p.author + " • " + new Date(p.date).toLocaleDateString();
+
+  document.getElementById("readContent").innerText = p.text;
+
+  window.scrollTo(0,0);
 }
 </script>
 
