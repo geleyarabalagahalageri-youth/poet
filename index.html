@@ -35,6 +35,14 @@ button{ width:100%; padding:12px; background:var(--accent); border:none; color:w
 
 <header ondblclick="adminLogin()"><b>ಊರ್ಮನಿಯರ್ ಹಾಡ್</b></header>
 
+<input 
+  type="text" 
+  id="searchInput" 
+  placeholder="🔍 Search diary..." 
+  onkeyup="searchPosts()"
+  style="width:90%; margin:10px 5%; padding:10px; border-radius:12px; border:1px solid #ccc;">
+
+
 <div id="list"></div>
 
 <!-- ✅ MOVE HERE -->
@@ -126,10 +134,15 @@ db.ref("poems").on("value", snap=>{
 });
 
 // RENDER
-function render(){
+function render(data = poemsArray){
   const list = document.getElementById("list");
 
-  list.innerHTML = poemsArray.map(p=>`
+  if(data.length === 0){
+    list.innerHTML = "<p style='text-align:center; margin-top:30px;'>No results found</p>";
+    return;
+  }
+
+  list.innerHTML = data.map(p=>`
     <div class="card" onclick="openFull('${p.id}')">
       <p>${(p.text || "").substring(0,100)}...</p>
 
@@ -139,7 +152,9 @@ function render(){
       </div>
 
       <div class="actions">
-        <span onclick="like('${p.id}', ${p.likes||0}); event.stopPropagation();">❤️ ${p.likes || 0}</span>
+        <span onclick="like('${p.id}', ${p.likes||0}); event.stopPropagation();">
+          ❤️ ${p.likes || 0}
+        </span>
         ${IS_OWNER ? `<span onclick="deletePoem('${p.id}'); event.stopPropagation();">🗑️</span>` : ""}
       </div>
     </div>
@@ -172,6 +187,20 @@ function savePoem(){
   .catch(err=>{
     alert("Error: "+err.message);
   });
+}
+
+function searchPosts(){
+  const query = document.getElementById("searchInput").value.toLowerCase();
+
+  const filtered = poemsArray.filter(p => {
+    return (
+      (p.title && p.title.toLowerCase().includes(query)) ||
+      (p.text && p.text.toLowerCase().includes(query)) ||
+      (p.author && p.author.toLowerCase().includes(query))
+    );
+  });
+
+  render(filtered);
 }
 
 // DELETE
